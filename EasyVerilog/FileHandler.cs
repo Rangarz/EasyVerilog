@@ -52,7 +52,5 @@ namespace EasyVerilog
                 text = sr.ReadToEnd();
             }
         }
-
-
     }
 }
