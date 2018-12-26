@@ -154,6 +154,7 @@
             this.Run.TabIndex = 15;
             this.Run.Text = "Run Simulation";
             this.Run.UseVisualStyleBackColor = false;
+            this.Run.Click += new System.EventHandler(this.Run_Click);
             // 
             // panel1
             // 
@@ -250,6 +251,7 @@
             this.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ForeColor = System.Drawing.Color.White;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "EasyVerilog";
             this.Load += new System.EventHandler(this.Form1_Load);
