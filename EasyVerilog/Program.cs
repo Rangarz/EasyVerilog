@@ -16,8 +16,11 @@ namespace EasyVerilog
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
-           
+
+            GUIDriver.Initialize();
+
+            Application.Run(GUIDriver.mainForm);
+            
         }
     }
 }

@@ -26,8 +26,6 @@ namespace EasyVerilog
 
             public static string LST_Init_var = null; // Modifiable
             public static string LST_Target_var = null;
-
-
         }
 
 
@@ -35,7 +33,7 @@ namespace EasyVerilog
         {
             InitializeComponent();
 
-            string[] HeaderText = { "module tsst310();", "// Inputs", "reg forceRequestA;", "reg forceRequestB;", "reg forceRequestC;", "reg[31:0] addressToContact;", "reg CLK;", "reg RESET;", " reg[1:0] phaseWire;", "// Instantiate the Unit Under Test (UUT)", " PCI uut(", "	.forceRequestA(forceRequestA),", ".forceRequestB(forceRequestB),", ".forceRequestC(forceRequestC),", ".addressToContact(addressToContact),", ".CLK(CLK),", ".RESET(RESET),", ".phaseWire(phaseWire)", "            );", "initial", "fork", "addressToContact = 0;", "CLK = 1;", "RESET = 0;", "#2", "   RESET = 1;" };
+            string[] HeaderText = { "module tsst310();","//counters" , "integer i;", "// Inputs", "reg forceRequestA;", "reg forceRequestB;", "reg forceRequestC;", "reg[31:0] addressToContact;", "reg CLK;", "reg RESET;", " reg[1:0] phaseWire;", "// Instantiate the Unit Under Test (UUT)", " PCI uut(", "	.forceRequestA(forceRequestA),", ".forceRequestB(forceRequestB),", ".forceRequestC(forceRequestC),", ".addressToContact(addressToContact),", ".CLK(CLK),", ".RESET(RESET),", ".phaseWire(phaseWire)", "            );", "initial", "fork", "$dumpvars(0, tsst310);", "for(i = 0; i < 10; i = i + 1)", "begin", "$dumpvars(0, uut.A.mem[i]);", "$dumpvars(0, uut.B.mem[i]);", " $dumpvars(0, uut.C.mem[i]);", "end", "addressToContact = 0;", "CLK = 1;", "RESET = 0;", "#2", "   RESET = 1;" };
             StreamWriter sw = new StreamWriter(Path.Combine(Application.StartupPath, "Testbench.v"));
             foreach (string line in HeaderText)
             {
@@ -47,7 +45,6 @@ namespace EasyVerilog
 
         private void button4_Click(object sender, EventArgs e)
         {
-
             //Getting the Textboxes Values
             Globals.Words_var = WordstextBox.Text;
             Globals.Time_var = TimetextBox.Text;
@@ -106,14 +103,14 @@ namespace EasyVerilog
             StreamWriter sw = new StreamWriter(Path.Combine(Application.StartupPath, "Testbench.v"), true);
           
             sw.WriteLine("#" + Globals.Time_var);
-            sw.WriteLine("forceReq"+ Globals.Initiator_var +" = 0;");
+            sw.WriteLine("forceRequest"+ Globals.Initiator_var +" = 0;");
             sw.WriteLine("#" + Globals.Time_var);
             sw.WriteLine("addressToContact = " + addrs + ";");
             sw.WriteLine("#" + Globals.Time_var);
             sw.WriteLine("phaseWire = " + Globals.Words_var + ";");
 
             sw.WriteLine("#" + time_str);
-            sw.WriteLine("forceReq" + Globals.Initiator_var + " = 1;");
+            sw.WriteLine("forceRequest" + Globals.Initiator_var + " = 1;");
 
             sw.Close();
 
@@ -279,21 +276,65 @@ namespace EasyVerilog
 
         private void easyVerilog_Click(object sender, EventArgs e)
         {
-            this.Close();
+            GUIDriver.ShowIDE();
         }
 
         private void Run_Click(object sender, EventArgs e)
         {
-            string[] FooterText = { "join", "always", "begin", "#1", " CLK = ~CLK;", "end", "endmodule"};
-            StreamWriter sw = new StreamWriter(Path.Combine(Application.StartupPath, "Testbench.v"),true);
-            foreach (string line in FooterText)
+            StreamReader sr = new StreamReader(Path.Combine(Application.StartupPath, "Testbench.v"));
+            string all = sr.ReadToEnd();
+            sr.Close();
+            if (!all.Contains("endmodule"))
             {
-                sw.WriteLine(line);
+                string[] FooterText = { "join", "always", "begin", "#1", " CLK = ~CLK;", "end", "endmodule" };
+                StreamWriter sw = new StreamWriter(Path.Combine(Application.StartupPath, "Testbench.v"), true);
+                foreach (string line in FooterText)
+                {
+                    sw.WriteLine(line);
+                }
+
+                sw.Close();
             }
 
-            sw.Close();
+            //Start Icarus and Waveform
 
-            //Start Icarus and Waveform 
+            //Opening the file
+            string text = " ";
+            try
+            {
+                FileHandler.OpenFileAbsolute(Path.Combine(Application.StartupPath, "Testbench.v"), out text);
+            }
+            catch(Exception ex)
+            {
+                GUIDriver.ShowIDE();
+                return;
+            }
+            
+            GUIDriver.mainForm.OnFileOpened(text);
+
+            int exitCode;
+            string errors;
+            string output;
+            ExecutionHandler.CompileAll(out exitCode, out errors);
+
+            if(exitCode != 0)
+            {
+                GUIDriver.mainForm.OnCompiled(exitCode, errors);
+                GUIDriver.ShowIDE();
+                return;
+            }
+
+
+            ExecutionHandler.Simulate(out exitCode, out errors, out output);
+
+            if(exitCode != 0 && exitCode != -1)
+            {
+                GUIDriver.mainForm.OnSimulated(exitCode, errors, output);
+                GUIDriver.ShowIDE();
+                return;
+            }
+
+            ExecutionHandler.DrawWave();
         }
     }
 }
