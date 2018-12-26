@@ -101,8 +101,8 @@ namespace EasyVerilog
             {
                 addrs = "2";
             }
-
-
+            int time_int = Int32.Parse(Globals.Time_var) + 2;
+            string time_str = time_int.ToString();
             StreamWriter sw = new StreamWriter(Path.Combine(Application.StartupPath, "Testbench.v"), true);
           
             sw.WriteLine("#" + Globals.Time_var);
@@ -112,7 +112,7 @@ namespace EasyVerilog
             sw.WriteLine("#" + Globals.Time_var);
             sw.WriteLine("phaseWire = " + Globals.Words_var + ";");
 
-            sw.WriteLine("#" + Globals.Time_var);
+            sw.WriteLine("#" + time_str);
             sw.WriteLine("forceReq" + Globals.Initiator_var + " = 1;");
 
             sw.Close();
