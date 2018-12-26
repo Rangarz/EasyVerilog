@@ -197,6 +197,8 @@ namespace EasyVerilog
                                 break;
                             case "begin":
                             case "end":
+                            case "{":
+                            case "}":
                                 richTextBox1.AppendText(word, Color.HotPink);
                                 break;
                             case "endmodule":

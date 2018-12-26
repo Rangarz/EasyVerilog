@@ -67,7 +67,12 @@ namespace EasyVerilog
             //If file was deleted successfully or it wasn't found
             using (var fs = File.Create(fullname))
             {
+                //Replace all { and } with begin and end
+                text = text.Replace("{", "begin");
+                text = text.Replace("}", "end"); 
+                //---------
                 Byte[] data = new UTF8Encoding(true).GetBytes(text);
+
                 fs.Write(data, 0, data.Length);
             }
         }
