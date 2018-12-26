@@ -11,10 +11,10 @@ using System.Windows.Forms;
 
 namespace EasyVerilog
 {
-    public partial class MainForm : Form
+    public partial class EasyVerilog : Form
     {
         bool ApplyColoring = false;
-        public MainForm()
+        public EasyVerilog()
         {
             InitializeComponent();
         }
@@ -29,10 +29,13 @@ namespace EasyVerilog
             DialogResult result = openFileDialog1.ShowDialog();
             if(result == DialogResult.OK)
             {
-                string text = "";
-                FileHandler.OpenFileAbsolute(openFileDialog1.FileName, out text);
+                foreach (String file in openFileDialog1.FileNames)
+                {
+                    string text = "";
+                    FileHandler.OpenFileAbsolute(file, out text);
 
-                OnFileOpened(text);
+                    OnFileOpened(text);
+                }
             }
         }
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -68,11 +71,7 @@ namespace EasyVerilog
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            for(int i = 0; i < listBox1.Items.Count; i++)
-            {
-                FileHandler.CreateFileAbsolute(OpenedFilesHandles.GetFullName(i), OpenedFilesHandles.GetText(i));
-            }
-            toolStripStatusLabel1.Text = "Saved all changes successfully";
+            SaveAll();
         }
 
         private void simulateToolStripMenuItem_Click(object sender, EventArgs e)
@@ -159,9 +158,8 @@ namespace EasyVerilog
         {
             //richTextBox1.AppendText(allText, Color.White);
             //Saving
-            var index = listBox1.SelectedIndex;
-            OpenedFilesHandles.SaveText(index, richTextBox1.Text);
-            toolStripStatusLabel1.Text = "Text changed, consider saving...";
+
+
         }
 
         private void ColorTextBox()
@@ -241,6 +239,29 @@ namespace EasyVerilog
             }
             */
         }
-        
+
+        private void EasyVerilog_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Control && e.KeyCode == Keys.S)
+            {
+                SaveAll();
+            }
+        }
+
+        private void SaveAll()
+        {
+            for (int i = 0; i < listBox1.Items.Count; i++)
+            {
+                FileHandler.CreateFileAbsolute(OpenedFilesHandles.GetFullName(i), OpenedFilesHandles.GetText(i));
+            }
+            toolStripStatusLabel1.Text = "Saved all changes successfully";
+        }
+
+        private void richTextBox1_TextChanged_1(object sender, EventArgs e)
+        {
+            var index = listBox1.SelectedIndex;
+            OpenedFilesHandles.SaveText(index, richTextBox1.Text);
+            toolStripStatusLabel1.Text = "Text changed, consider saving...";
+        }
     }
 }

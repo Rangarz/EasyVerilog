@@ -9,12 +9,12 @@ namespace EasyVerilog
     static class GUIDriver
     {
         public static Form1 form1;
-        public static MainForm mainForm;
+        public static EasyVerilog mainForm;
 
         public static void Initialize()
         {
             form1 = new Form1();
-            mainForm = new MainForm();
+            mainForm = new EasyVerilog();
         }
         public static void ShowGUI()
         {
