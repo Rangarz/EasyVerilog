@@ -2,12 +2,15 @@
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Collections.Generic;
 
 namespace EasyVerilog
 {
     public static class FileHandler
     {
         private static string _projectPath;
+
+        //public static List<string> OpenedFiles = new List<string>();
 
         public static void SetPath(string path)
         {
@@ -40,6 +43,35 @@ namespace EasyVerilog
             }
         }
 
+        /// <summary>
+        /// This deletes the text file if exists, and make a new one with the new text.
+        /// Can be used for saving or creating new files.
+        /// </summary>
+        /// <param name="fullname">The full path to the file</param>
+        /// <param name="text">The text inside</param>
+        public static void CreateFileAbsolute(string fullname, string text)
+        {
+            try
+            {
+                if (File.Exists(fullname))
+                {
+                    File.Delete(fullname);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+            //If file was deleted successfully or it wasn't found
+            using (var fs = File.Create(fullname))
+            {
+                Byte[] data = new UTF8Encoding(true).GetBytes(text);
+                fs.Write(data, 0, data.Length);
+            }
+        }
+
         public static void OpenFile(string filename, out string text)
         {
             if (string.IsNullOrEmpty(_projectPath))
@@ -51,6 +83,21 @@ namespace EasyVerilog
             {
                 text = sr.ReadToEnd();
             }
+        }
+        /// <summary>
+        /// This takes in the full path to the file including its name.
+        /// This also adds the fullname to the opened files.
+        /// </summary>
+        /// <param name="fullname">Full path to file including nam e</param>
+        /// <param name="text">The data inside the text file</param>
+        public static void OpenFileAbsolute(string fullname, out string text)
+        {
+            text = "";
+            using (var sr = File.OpenText(fullname))
+            {
+                text = sr.ReadToEnd();
+            }
+           OpenedFilesHandles.AddOpenFile(fullname, text);
         }
     }
 }

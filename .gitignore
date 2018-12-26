@@ -339,3 +339,8 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database 
 healthchecksdb
+EasyVerilog/EasyVerilog\.csproj
+
+EasyVerilog/obj/Debug/DesignTimeResolveAssemblyReferencesInput\.cache
+
+EasyVerilog/obj/Debug/EasyVerilog\.csproj\.CoreCompileInputs\.cache
